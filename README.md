@@ -1,5 +1,5 @@
-## (Coming August 2021) Always Be Dreaming: A New Approach for Data-Free Class-Incremental Learning
-PyTorch code for the ICCV 2021 paper (Coming August 2021):\
+## (Coming September 2021) Always Be Dreaming: A New Approach for Data-Free Class-Incremental Learning
+PyTorch code for the ICCV 2021 paper (Coming September 2021):\
 **Always Be Dreaming: A New Approach for Data-Free Class-Incremental Learning**\
 **_[James Smith]_**, Yen-Chang Hsu, [Jonathan Balloch], Yilin Shen, Hongxia Jin, [Zsolt Kira]\
 International Conference on Computer Vision (ICCV), 2021\
