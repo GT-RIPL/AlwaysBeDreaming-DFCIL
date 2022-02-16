@@ -38,18 +38,34 @@ def get_transform(dataset='cifar100', phase='test', aug=True, dgr=False):
             dset_std = (1.0,1.0,1.0)
 
     if phase == 'train' and aug:
-        transform_list.extend([
-            transforms.ColorJitter(brightness=63/255, contrast=0.8),
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomCrop(crop_size, padding=4),
-            transforms.ToTensor(),
-            transforms.Normalize(dset_mean, dset_std),
-                            ])
-    else:
-        transform_list.extend([
+        if dataset == 'ImageNet':
+            transform_list.extend([
+                transforms.RandomResizedCrop(224),
+                transforms.RandomHorizontalFlip(),
                 transforms.ToTensor(),
                 transforms.Normalize(dset_mean, dset_std),
                                 ])
+        else:
+            transform_list.extend([
+                transforms.ColorJitter(brightness=63/255, contrast=0.8),
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.RandomCrop(crop_size, padding=4),
+                transforms.ToTensor(),
+                transforms.Normalize(dset_mean, dset_std),
+                                ])
+    else:
+        if dataset == 'ImageNet':
+            transform_list.extend([
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
+                transforms.Normalize(dset_mean, dset_std),
+                                ])
+        else:
+            transform_list.extend([
+                    transforms.ToTensor(),
+                    transforms.Normalize(dset_mean, dset_std),
+                                    ])
 
     return transforms.Compose(transform_list)
 

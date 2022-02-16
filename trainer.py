@@ -61,8 +61,12 @@ class Trainer:
             print('=============================================')
             print('Shuffling....')
             print('pre-shuffle:' + str(class_order))
-            random.seed(self.seed)
-            random.shuffle(class_order)
+            if args.dataset == 'ImageNet':
+                np.random.seed(1993)
+                np.random.shuffle(class_order)
+            else:
+                random.seed(self.seed)
+                random.shuffle(class_order)
             print('post-shuffle:' + str(class_order))
             print('=============================================')
         self.tasks = []

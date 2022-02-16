@@ -677,3 +677,16 @@ def jpg_image_to_array(image_path):
         im_arr = np.fromstring(image.tobytes(), dtype=np.uint8)
         im_arr = im_arr.reshape((image.size[1], image.size[0], 3))                                   
     return im_arr
+
+def get_data(root_images):
+
+    import glob
+    files = glob.glob(root_images+'/*/*.JPEG')
+    data = {}
+    for path in files:
+        y = os.path.basename(os.path.dirname(path))
+        if y in data:
+            data[y].append(path)
+        else:
+            data[y] = [path]
+    return data
