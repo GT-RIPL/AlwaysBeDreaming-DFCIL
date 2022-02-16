@@ -207,6 +207,7 @@ class LWF_MC(LWF):
 
     def __init__(self, learner_config):
         super(LWF_MC, self).__init__(learner_config)
+        self.ce_loss = nn.BCELoss(reduction='sum')
 
     def update_model(self, inputs, targets, target_KD = None):
         
@@ -215,17 +216,12 @@ class LWF_MC(LWF):
 
         # KD
         if target_KD is not None:
-            target = get_one_hot(targets, self.valid_out_dim)
-            target_KD = F.softmax(target_KD, dim=1)
-            target[:, :self.last_valid_out_dim] = target_KD
-
-            log_logits= F.log_softmax(logits, dim=1)
-            KD_loss_unnorm = -(target * log_logits)
-            KD_loss_unnorm = KD_loss_unnorm.sum(dim=1)
-            total_loss= KD_loss_unnorm.mean()
+            target_mod = get_one_hot(targets, self.valid_out_dim)
+            target_mod[:, :self.last_valid_out_dim] = torch.sigmoid(target_KD)
+            total_loss = self.ce_loss(torch.sigmoid(logits), target_mod) / len(logits)
         else:
-            dw_cls = self.dw_k[-1 * torch.ones(targets.size()).long()]
-            total_loss = self.criterion(logits, targets.long(), dw_cls)
+            target_mod = get_one_hot(targets, self.valid_out_dim)
+            total_loss = self.ce_loss(torch.sigmoid(logits), target_mod) / len(logits)
 
         self.optimizer.zero_grad()
         total_loss.backward()

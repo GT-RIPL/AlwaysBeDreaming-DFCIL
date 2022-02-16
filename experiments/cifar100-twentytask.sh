@@ -106,6 +106,14 @@ python -u run_dfcil.py --dataset CIFAR100 --train_aug --rand_split --gpuid $GPUI
     --learner_type kd --learner_name LWF \
     --overwrite $OVERWRITE --max_task $MAXTASK --log_dir ${OUTDIR}/lwf
 
+# LwF.MC
+python -u run_dfcil.py --dataset CIFAR100 --train_aug --rand_split --gpuid $GPUID --repeat $REPEAT \
+    --first_split_size $SPLIT --other_split_size $SPLIT --schedule $SCHEDULE --schedule_type decay --batch_size $BS \
+    --optimizer $OPT --lr $LR --momentum $MOM --weight_decay $WD \
+    --mu 1 --memory 0 --model_name $MODELNAME --model_type resnet \
+    --learner_type kd --learner_name LWF_MC \
+    --overwrite $OVERWRITE --max_task $MAXTASK --log_dir ${OUTDIR}/lwf_mc
+
 # Naive Rehearsal
 python -u run_dfcil.py --dataset CIFAR100 --train_aug --rand_split --gpuid $GPUID --repeat $REPEAT \
     --first_split_size $SPLIT --other_split_size $SPLIT --schedule $SCHEDULE --schedule_type decay --batch_size $BS \

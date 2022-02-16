@@ -42,6 +42,7 @@ outputs/
 *.pth
 *.png
 .swp
+.experiments/imnet-fivetask.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

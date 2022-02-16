@@ -544,6 +544,136 @@ class iCIFAR100(iCIFAR10):
     im_size=32
     nch=3
 
+class iIMAGENET(iDataset):
+    
+    base_folder = 'ilsvrc'
+    im_size=224
+    nch=3
+    def load(self):
+        self.dw = False
+        self.data, self.targets = [], []
+        images_path = os.path.join(self.root, self.base_folder)
+        if self.train or self.validation:
+            images_path = os.path.join(images_path, 'train')
+            data_dict = get_data(images_path)
+        else:
+            images_path = os.path.join(images_path, 'val')
+            data_dict = get_data(images_path)
+        y = 0
+        for key in data_dict.keys():
+            num_y = len(data_dict[key])
+            self.data.extend([data_dict[key][i] for i in np.arange(0,num_y)])
+            self.targets.extend([y for i in np.arange(0,num_y)])
+            y += 1
 
 
+    def __getitem__(self, index, simple = False):
+        """
+        Args:
+            index (int): Index
 
+        Returns:
+            tuple: (image, target) where target is index of the target class
+        """
+        img_path, target = self.data[index], self.targets[index]
+        img = jpg_image_to_array(img_path)
+
+        # doing this so that it is consistent with all other datasets
+        # to return a PIL Image
+        img = Image.fromarray(img)
+
+        if self.transform is not None:
+            if simple:
+                img = self.simple_transform(img)
+            else:
+                img = self.transform(img)
+
+        return img, self.class_mapping[target], self.t
+
+    
+    def parse_archives(self) -> None:
+        if not check_integrity(os.path.join(self.root, META_FILE)):
+            parse_devkit_archive(self.root)
+
+        if not os.path.isdir(self.split_folder):
+            if self.split == 'train':
+                parse_train_archive(self.root)
+            elif self.split == 'val':
+                parse_val_archive(self.root)
+
+    @property
+    def split_folder(self) -> str:
+        return os.path.join(self.root, self.split)
+
+    def extra_repr(self) -> str:
+        return "Split: {split}".format(**self.__dict__)
+
+class iTinyIMNET(iDataset):
+    
+    im_size=64
+    nch=3
+
+    def load(self):
+        self.dw = False
+        self.data, self.targets = [], []
+
+        from os import path
+        root = self.root
+        FileNameEnd = 'JPEG'
+        train_dir = path.join(root, 'tiny-imagenet/tiny-imagenet-200/train')
+        self.class_names = sorted(os.listdir(train_dir))
+        self.names2index = {v: k for k, v in enumerate(self.class_names)}
+        self.data = []
+        self.targets = []
+
+        if self.train:
+            for label in self.class_names:
+                d = path.join(root, 'tiny-imagenet/tiny-imagenet-200/train', label)
+                for directory, _, names in os.walk(d):
+                    for name in names:
+                        filename = path.join(directory, name)
+                        if filename.endswith(FileNameEnd):
+                            self.data.append(filename)
+                            self.targets.append(self.names2index[label])
+        else:
+            val_dir = path.join(root, 'tiny-imagenet/tiny-imagenet-200/val')
+            with open(path.join(val_dir, 'val_annotations.txt'), 'r') as f:
+                infos = f.read().strip().split('\n')
+                infos = [info.strip().split('\t')[:2] for info in infos]
+                self.data = [path.join(val_dir, 'images', info[0])for info in infos]
+                self.targets = [self.names2index[info[1]] for info in infos]
+
+
+    def __getitem__(self, index, simple = False):
+        """
+        Args:
+            index (int): Index
+
+        Returns:
+            tuple: (image, target) where target is index of the target class
+        """
+        img_path, target = self.data[index], self.targets[index]
+        img = jpg_image_to_array(img_path)
+
+        # doing this so that it is consistent with all other datasets
+        # to return a PIL Image
+        img = Image.fromarray(img)
+
+        if self.transform is not None:
+            if simple:
+                img = self.simple_transform(img)
+            else:
+                img = self.transform(img)
+
+        return img, self.class_mapping[target], self.t
+
+def jpg_image_to_array(image_path):
+    """
+    Loads JPEG image into 3D Numpy array of shape 
+    (width, height, channels)
+    """
+    with Image.open(image_path) as image:      
+        image = image.convert('RGB')
+        im_arr = np.fromstring(image.tobytes(), dtype=np.uint8)
+        im_arr = im_arr.reshape((image.size[1], image.size[0], 3))                                   
+    return im_arr

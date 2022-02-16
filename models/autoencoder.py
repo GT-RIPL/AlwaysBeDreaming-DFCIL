@@ -221,5 +221,3 @@ class AutoEncoder(nn.Module):
 
 def CIFAR_GEN(bn = False):
     return AutoEncoder(in_channel=3, img_sz=32, kernel_num=512, z_size=1024)
-
-

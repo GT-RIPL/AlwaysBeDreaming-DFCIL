@@ -42,6 +42,15 @@ class Trainer:
             Dataset = dataloaders.iCIFAR100
             num_classes = 100
             self.dataset_size = [32,32,3]
+        elif args.dataset == 'ImageNet':
+            Dataset = dataloaders.iIMAGENET
+            num_classes = 1000
+            self.dataset_size = [224,224,3]
+            self.top_k = 5
+        elif args.dataset == 'TinyImageNet':
+            Dataset = dataloaders.iTinyIMNET
+            num_classes = 200
+            self.dataset_size = [64,64,3]
         else:
             raise ValueError('Dataset not implemented!')
 
