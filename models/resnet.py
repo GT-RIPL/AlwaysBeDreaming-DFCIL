@@ -112,6 +112,9 @@ class ResNet(nn.Module):
 def resnet32(out_dim):
     return ResNet(BasicBlock, [5, 5, 5], num_classes=out_dim)
 
+def resnet18(out_dim):
+    return ResNet(BasicBlock, [2, 2, 2, 2], num_classes=out_dim)
+
 class BiasLayer(nn.Module):
     def __init__(self):
         super(BiasLayer, self).__init__()
